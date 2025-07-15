@@ -1,0 +1,115 @@
+Item id,Category,Item Name,Price
+
+1,Appetizers,Paneer Tikka,150
+
+2,Appetizers,Chicken Seekh Kebab,180
+
+3,Appetizers,आलू टिक्की (Aloo Tikki),70
+
+4,Appetizers,Chicken 65,160
+
+5,Appetizers,Sambar Vada,70
+
+6,Appetizers,Thayir Vadai / Dahi Vada,70
+
+7,Appetizers,Kalaki,40
+
+8,Snacks,Masala Dosa / Dosai,100
+
+9,Snacks,Onion Dosa / Vengaya Dosai,110
+
+10,Snacks,Medhu Vada / Vadai,60
+
+11,Snacks,Masala Vadai,50
+
+12,Snacks,Pongal,90
+
+13,Snacks,पाव भाजी (Pav Bhaji),110
+
+14,Snacks,Maggie Goreng,90
+
+15,Snacks,Egg Paratha / Muttai Parotta,80
+
+16,Snacks,Chicken Murtabak,120
+
+17,Snacks,Mutton Murtabak,140
+
+18,Snacks,Koali Soaru (Chicken Broth Rice),120
+
+19,Snacks,Nasi Goreng,130
+
+20,Snacks,Nasi Lemak,110
+
+21,Main Course - Vegetarian,Paneer Butter Masala,200
+
+22,Main Course - Vegetarian,Dal Makhani,180
+
+23,Main Course - Vegetarian,छोले भटूरे (Chole Bhature),130
+
+24,Main Course - Non-Vegetarian,Butter Chicken,250
+
+25,Main Course - Non-Vegetarian,Lamb Rogan Josh,280
+
+26,Main Course - Non-Vegetarian,चिकन करी (Chicken Curry),240
+
+27,Main Course - Non-Vegetarian,Mysore Mutton,270
+
+28,Main Course - Non-Vegetarian,Pallipalayam Chicken,250
+
+29,Main Course - Non-Vegetarian,Chicken Briyani,220
+
+30,Main Course - Non-Vegetarian,Mutton Briyani,260
+
+31,Main Course - Non-Vegetarian,Egg Briyani,190
+
+32,Main Course - Non-Vegetarian,Plain Briyani,150
+
+33,Main Course - Non-Vegetarian,Kothu Parotta,130
+
+34,Breads,Naan,30
+
+35,Breads,Garlic Naan,40
+
+36,Breads,Tandoori Roti,20
+
+37,Breads,आलू पराठा (Aloo Paratha),60
+
+38,Breads,Plain Parotta / Paratha / Paratta,35
+
+39,Desserts,Gulab Jamun,60
+
+40,Desserts,Rasgulla,60
+
+41,Desserts,रबड़ी (Rabri),80
+
+42,Hot Beverages,Masala Chai,30
+
+43,Hot Beverages,Filter Coffee,35
+
+44,Hot Beverages,Elaichi Chai (Cardamom Tea),35
+
+45,Hot Beverages,Ginger Tea,30
+
+46,Hot Beverages,Hot Milk,25
+
+47,Cold Beverages,Lassi (Sweet),50
+
+48,Cold Beverages,Lassi (Salted),50
+
+49,Cold Beverages,Buttermilk / Neer Mor,30
+
+50,Cold Beverages,Cold Coffee,60
+
+51,Cold Beverages,Fresh Lime Soda (Sweet/Salt/Mix),40
+
+52,Cold Beverages,Rose Milk,45
+
+53,Cold Beverages,Falooda,80
+
+54,Bottled / Packaged,Bottled Water,20
+
+55,Bottled / Packaged,Soft Drinks (Coke / Pepsi),40
+
+56,Bottled / Packaged,Packaged Juice (Mango / Orange),45
+
+57,Bottled / Packaged,Tender Coconut,40

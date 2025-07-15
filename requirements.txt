@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+whisper
+openai
+python-dotenv
+soundfile
+scipy
+numpy
+pandas
+noisereduce
+requests
