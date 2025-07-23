@@ -9,3 +9,4 @@ numpy
 pandas
 noisereduce
 requests
+pytest
