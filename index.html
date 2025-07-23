@@ -1,0 +1,1290 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+   <meta charset="UTF-8" />
+   <title>Voice Food Ordering App</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <style>
+    :root {
+      --primary: #e5c07b;
+      --background: #121212;
+      --surface: #1e1e1e;
+      --text: #ffffff;
+      --muted: #999;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--background);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+    }
+
+    h1, h2, h3 {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .container {
+      display: flex;
+      padding: 30px;
+      gap: 30px;
+    }
+
+    aside {
+      width: 30%;
+      max-height: 90vh;
+      overflow-y: auto;
+      background-color: var(--surface);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    main {
+      width: 70%;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+  #fullTranscriptText {
+    background-color: #5a5353;
+    border-left: 4px solid #4CAF50;
+    padding: 12px 16px;
+    margin-top: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    white-space: pre-line;
+    transition: background-color 0.3s ease;
+  }
+
+  #fullTranscriptText:hover {
+    background-color: #e8f5e9;
+  }
+
+    section {
+      background-color: var(--surface);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    button {
+      background-color: var(--primary);
+      border: none;
+      color: #000;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      margin: 5px 5px 10px 0;
+      transition: background 0.3s ease;
+    }
+
+    /* button:hover {
+      background-color: #d4b168;
+    } */
+    button:disabled {
+      background-color: #ccc;
+    }
+
+    input[type="file"] {
+      background-color: transparent;
+      color: var(--text);
+      margin-top: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      color: var(--text);
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #333;
+      text-align: left;
+    }
+
+    th {
+      background-color: #1c1c1c;
+    }
+
+    td input[type="checkbox"] {
+      transform: scale(1.2);
+    }
+
+    .menu-section {
+      margin-bottom: 25px;
+    }
+
+    .menu-section img {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      object-fit: cover;
+    }
+
+    .menu-section h3 {
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .menu-section li {
+      list-style: none;
+      margin: 5px 0;
+      color: var(--muted);
+    }
+
+    #final-order-summary {
+      background-color: #181818;
+      border: 1px solid var(--primary);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      aside, main {
+        width: 100%;
+      }
+    }
+  </style>
+ </head>
+ <body>
+  <div class="container">
+    <aside>
+      <h2>🍽 Menu</h2>
+      <div id="menu-container"></div>
+    </aside>
+    <main>
+      <h1>Voice Food Ordering App   <button onclick="showIntro()" style="
+  padding: 4px 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  background-color: #e5c07b;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  margin-bottom: 10px;
+">
+  🍟 Intro
+</button>
+</h1>
+<div id="introModal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); width:90%; max-width:500px; background:#000000; border-radius:12px; padding:20px; box-shadow:0 0 20px rgba(0,0,0,0.3); z-index:1000;">
+  <h2>📘 How to Use</h2>
+  <ul style="line-height:1.7; padding-left:20px;">
+    <li><strong>🟢Start Recording</strong>: Click ⏺ or say <em>“Start recording”</em></li>
+    <li><strong>🗣️Speak your order</strong>: Example: “Chicken 65, 2 Kalaki”</li>
+    <li><strong>🔴Stop Recording</strong>: Click ⏹ or say <em>“Stop recording”</em></li>
+    <li><strong>➕Add Items</strong>: Click or say <em>“Add item”</em> to use a checkbox menu</li>
+    <li><strong>❌Remove Items</strong>:
+      <ul>
+        <li>Say <em>“Remove Kalaki”</em> → removes all</li>
+        <li>Say <em>“Remove 1 Kalaki”</em> → removes one</li>
+      </ul>
+    </li>
+    <li><strong>✅Confirm Order</strong>: Say or click <em>“Confirm order”</em></li>
+    <li><strong>🔄️Reset</strong>: Say or click <em>“New order”</em></li>
+  </ul>
+  <button onclick="closeIntro()" style="margin-top:10px;">❌ Close</button>
+</div>
+
+  <section>
+   <h2>🎤 Record or Upload WAV</h2>
+   <button onclick="startRecording()">⏺ Start Recording</button>
+   <button onclick="stopRecording()">⏹ Stop Recording</button><br />
+   <input type="file" id="audioUpload" accept="audio/*">
+   <button onclick="processAudio()">📅 Process</button>
+  </section>
+ <section>
+  <p id="fullTranscriptText">🗣 Full transcript will appear here...</p>
+   <h2>📝 Transcription</h2>
+   <p id="transcriptionText">No transcription yet...</p>
+ </section>
+
+<div style="margin-top: 20px;">
+  <p id="gptResponseText"></p>
+  <p id="matchAccuracy"></p>
+  <p id="unmatchedItems"></p>
+</div>
+
+<div id="miniMenuModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);
+  width: 300px; max-height: 400px; background:#fff; color:#000;border:2px solid #333;
+  padding: 20px; z-index:1000; box-shadow: 0 0 10px rgba(0,0,0,0.4); border-radius: 10px;">
+  
+  <h3 style="margin-top: 0;">🛒 Select Items</h3>
+  
+  <div id="miniMenuScrollBox" style="max-height: 250px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
+    <form id="miniMenuForm"></form>
+  </div>
+
+  <button onclick="submitMiniMenu()">✅ Add Selected</button>
+  <button onclick="closeMiniMenu()">❌ Close</button>
+  <button onclick="triggerVoiceFromMiniMenu()">🎙️ Start recording</button>
+
+</div>
+
+
+ <section>
+   <h2>🧾 Order Items</h2>
+   <table id="orderTable">
+     <thead>
+     <tr>
+       <th class="checkbox-column"></th>
+       <th>Item</th>
+       <th>Rate</th>
+       <th>Quantity</th>
+       <th>Total</th>
+     </tr>
+     </thead>
+     <tbody></tbody>
+   </table>
+   <button onclick="addItems()">➕ Add More</button>
+   <button onclick="removeItems()" id="removeBtn" disabled>❌ Remove Selected</button>
+   <button onclick="confirmOrder()">✅ Confirm Order</button>
+   <button onclick="resetOrder()">🔄 New Order</button>
+  </section>
+ 
+ <section id="final-order-summary" style="display: none;">
+   <h2>✅ Final Order Summary</h2>
+   <ul id="final-order-list"></ul>
+   <p id="total-amount"></p>
+ </section>
+</main>
+</div>
+ <script>
+  window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+recognition.continuous = true;
+recognition.interimResults = false;
+recognition.lang = 'en-US';
+
+let isInitialized = false;
+let isRecording = false;
+let liveTranscript = "";
+function showIntro() {
+  document.getElementById("introModal").style.display = "block";
+}
+
+function closeIntro() {
+  document.getElementById("introModal").style.display = "none";
+}
+
+const startBtn = document.querySelector("button[onclick='startRecording()']");
+const stopBtn = document.querySelector("button[onclick='stopRecording()']");
+const processBtn = document.querySelector("button[onclick='processAudio()']");
+const transcriptionText = document.getElementById("transcriptionText");
+
+recognition.onresult = (event) => {
+  const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+  console.log('Heard:', transcript);
+
+  const controlPhrases = ["stop recording", "stop", "done"]; // Add more as needed
+  const isControlPhrase = controlPhrases.some(phrase => transcript.includes(phrase));
+
+  if (isRecording && !isControlPhrase) {
+    liveTranscript += transcript + ". ";
+    document.getElementById("fullTranscriptText").innerText = liveTranscript;
+  }
+
+  if (!isInitialized && (transcript.includes("hi") || transcript.includes("hello"))) {
+    alert("Hi! Let's start ordering.");
+    transcriptionText.innerText = "Hi! Let's start ordering.";
+    isInitialized = true;
+    return;
+  }
+function triggerVoiceFromMiniMenu() {
+  closeMiniMenu();
+
+  if (!startBtn.disabled) {
+    startRecording();
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+    transcriptionText.innerText = "Recording started. You can now add items by voice.";
+  }
+}
+if (transcript.includes("start recording")) {
+  const modal = document.getElementById("miniMenuModal");
+  if (modal.style.display === "block") {
+    triggerVoiceFromMiniMenu();
+  }
+  return;
+}
+
+  if (isInitialized && (transcript.includes("start") || transcript.includes("let's start") || transcript.includes("start ordering"))) {
+    if (!startBtn.disabled) {
+      startRecording();
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      transcriptionText.innerText = "Recording started. You can now order.";
+    }
+    return;
+  }
+
+  if (isInitialized && (transcript.includes("stop") || transcript.includes("done"))) {
+    if (!stopBtn.disabled) {
+      stopRecording();
+      stopBtn.disabled = true;
+      startBtn.disabled = false;
+      transcriptionText.innerText = "Recording stopped.";
+    }
+    return;
+  }
+
+  if (isInitialized && transcript.includes("process")) {
+    processAudio();
+    transcriptionText.innerText = "Processing audio...";
+    return;
+  }
+if (transcript.includes("confirm") || transcript.includes("place order") || transcript.includes("confirm order")) {
+  const confirmBtn = document.querySelector("button[onclick='confirmOrder()']");
+  if (!confirmBtn.disabled) {
+    confirmBtn.click();
+    transcriptionText.innerText = "Your order has been confirmed. Thank you!";
+    alert("Order confirmed!");
+
+  }
+}
+if (transcript.includes("new order") || transcript.includes("reset") || transcript.includes("start again")) {
+  const newOrderBtn = document.querySelector("button[onclick='resetOrder()']");
+  if (newOrderBtn) {
+    newOrderBtn.click();
+    transcriptionText.innerText = "Order has been reset. You can start a new one.";
+    alert("Order reset!");
+  }
+}
+if (transcript.includes("add item") || transcript.includes("add to cart") || transcript.includes("add product")) {
+  const addItemBtn = document.querySelector("button[onclick='addItems()']");
+    openMiniMenu();
+  if (addItemBtn) {
+    addItemBtn.click();
+    speakMessage("Item has been added to your cart.");
+  }
+}
+// if (transcript.includes("remove item") || transcript.includes("remove") || transcript.includes("delete item")) {
+//   const removeMatch = transcript.match(/remove item (\d+)/i);
+  
+//   if (removeMatch) {
+//     // Remove by item number (e.g., "remove item 2")
+//     const itemIndex = parseInt(removeMatch[1], 10) - 1;
+//     const rows = document.querySelectorAll('#orderTable tbody tr');
+//     if (rows[itemIndex]) {
+//       rows[itemIndex].remove();
+//       document.getElementById('removeBtn').disabled = true;
+//     }
+//   } else {
+//     // Remove checked item or default to first row
+//     const checkboxes = document.querySelectorAll('#orderTable tbody input[type="checkbox"]');
+//     let anyChecked = false;
+
+//     checkboxes.forEach(checkbox => {
+//       if (checkbox.checked) {
+//         checkbox.closest('tr').remove();
+//         anyChecked = true;
+//       }
+//     });
+
+//     if (!anyChecked) {
+//       const firstRow = document.querySelector('#orderTable tbody tr');
+//       if (firstRow) firstRow.remove();
+//     }
+
+//     document.getElementById('removeBtn').disabled = true;
+//   }
+// }
+// if (transcript.includes("remove")) {
+//   const removePattern = /remove(?: (\d+))?\s+(.+)/i;
+//   const match = transcript.match(removePattern);
+
+//   if (match) {
+//     const quantityToRemove = match[1] ? parseInt(match[1], 10) : null;
+//     let spokenItem = match[2].trim().toLowerCase().replace(/[.,!?]/g, "");
+
+//     const rows = document.querySelectorAll('#orderTable tbody tr');
+//     let itemFound = false;
+
+//     rows.forEach(row => {
+//       const rowItem = row.children[1].textContent.trim().toLowerCase().replace(/[.,!?]/g, "");
+
+//       if (rowItem.includes(spokenItem)) {
+//         itemFound = true;
+
+//         const qtySpan = row.querySelector('.qty');
+//         let currentQty = parseInt(qtySpan.textContent);
+
+//         if (quantityToRemove === null || quantityToRemove >= currentQty) {
+//           row.remove(); // Remove the whole row
+//         } else {
+//           // Reduce quantity
+//           currentQty -= quantityToRemove;
+//           qtySpan.textContent = currentQty;
+//           const rate = parseFloat(row.children[2].textContent);
+//           row.querySelector('.total').textContent = (rate * currentQty).toFixed(2);
+//         }
+//       }
+//     });
+
+//     if (!itemFound) {
+//       alert(`Item "${spokenItem}" not found in order.`);
+//     }
+
+//     document.getElementById('removeBtn').disabled = true;
+//   } else {
+//     // fallback: checkbox-based or first item
+//     const checkboxes = document.querySelectorAll('#orderTable tbody input[type="checkbox"]');
+//     let anyChecked = false;
+
+//     checkboxes.forEach(checkbox => {
+//       if (checkbox.checked) {
+//         checkbox.closest('tr').remove();
+//         anyChecked = true;
+//       }
+//     });
+
+//     if (!anyChecked) {
+//       const firstRow = document.querySelector('#orderTable tbody tr');
+//       if (firstRow) firstRow.remove();
+//     }
+
+//     document.getElementById('removeBtn').disabled = true;
+//   }
+// }/
+// const removeMatch = transcript.match(/(?:remove(?: (\d+))?|remove entire|i don't like|no more|take off)\s+(.+)/i);
+
+// if (removeMatch) {
+//   const quantityToRemove = removeMatch[1] ? parseInt(removeMatch[1], 10) : null;
+//   let spokenItem = normalizeText(removeMatch[2]);
+
+//   const rows = document.querySelectorAll('#orderTable tbody tr');
+//   let itemFound = false;
+
+//   rows.forEach(row => {
+//     const rowItem = normalizeText(row.children[1].textContent);
+
+//     if (rowItem.includes(spokenItem)) {
+//       itemFound = true;
+
+//       const qtySpan = row.querySelector('.qty');
+//       let currentQty = parseInt(qtySpan.textContent);
+
+//       if (quantityToRemove === null || quantityToRemove >= currentQty) {
+//         row.remove(); // Remove entire row
+//       } else {
+//         currentQty -= quantityToRemove;
+//         qtySpan.textContent = currentQty;
+//         const rate = parseFloat(row.children[2].textContent);
+//         row.querySelector('.total').textContent = (rate * currentQty).toFixed(2);
+//       }
+//     }
+//   });
+
+//   if (!itemFound) {
+//     alert(`Item "${spokenItem}" not found in order.`);
+//   }
+
+//   document.getElementById('removeBtn').disabled = true;
+// }
+// function normalizeText(text) {
+//   return text.trim().toLowerCase().replace(/[.,!?]/g, "");
+// }
+
+// if (transcript.includes("add")) {
+//   const addPattern = /add (\d+)\s+(.+)/i;
+//   const match = transcript.match(addPattern);
+
+//   if (match) {
+//     const quantityToAdd = parseInt(match[1], 10);
+//     let spokenItem = match[2].trim().toLowerCase().replace(/[.,!?]/g, "");
+
+//     const rows = document.querySelectorAll('#orderTable tbody tr');
+//     let itemFound = false;
+
+//     rows.forEach(row => {
+//       const rowItem = row.children[1].textContent.trim().toLowerCase().replace(/[.,!?]/g, "");
+
+//       if (rowItem.includes(spokenItem)) {
+//         itemFound = true;
+
+//         const qtySpan = row.querySelector('.qty');
+//         let currentQty = parseInt(qtySpan.textContent);
+//         const newQty = currentQty + quantityToAdd;
+//         qtySpan.textContent = newQty;
+
+//         const rate = parseFloat(row.children[2].textContent);
+//         const totalCell = row.querySelector('.total');
+//         totalCell.textContent = (rate * newQty).toFixed(2);
+//       }
+//     });
+
+//     if (!itemFound) {
+//       alert(`Item "${spokenItem}" not found in order. Please add it first.`);
+//     }
+//   }
+// }
+function normalizeText(text) {
+  return text
+    .toLowerCase()
+    .replace(/[.,!?]/g, "")         // remove punctuation
+    .replace(/\s+/g, " ")           // normalize spaces
+    .trim();
+}
+
+// Levenshtein Distance
+function levenshteinDistance(a, b) {
+  a = a.toLowerCase();
+  b = b.toLowerCase();
+  const dp = Array.from({ length: b.length + 1 }, () => []);
+  for (let i = 0; i <= a.length; i++) dp[0][i] = i;
+  for (let j = 0; j <= b.length; j++) dp[j][0] = j;
+
+  for (let j = 1; j <= b.length; j++) {
+    for (let i = 1; i <= a.length; i++) {
+      dp[j][i] = Math.min(
+        dp[j - 1][i] + 1,
+        dp[j][i - 1] + 1,
+        dp[j - 1][i - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+    }
+  }
+  return dp[b.length][a.length];
+}
+
+// Improved fuzzy match using similarity score
+function isFuzzyMatch(a, b) {
+  a = normalizeText(a);
+  b = normalizeText(b);
+  const distance = levenshteinDistance(a, b);
+  const maxLen = Math.max(a.length, b.length);
+  const similarity = 1 - distance / maxLen;
+  return similarity >= 0.6 || a.includes(b) || b.includes(a);
+}
+
+// Number word mapping
+const numberWords = {
+  one: 1, two: 2, to: 2, too: 2, three: 3, for:4,four: 4, five: 5,
+  six: 6, seven: 7, eight: 8, nine: 9, ten: 10
+};
+
+// ========================== REMOVE =============================
+// const removeMatch = transcript.match(/(?:remove(?: (\w+))?|remove entire|i don't like|no more|take off)\s+(.+)/i);
+
+// if (removeMatch) {
+//   const qtyWord = removeMatch[1]?.toLowerCase();
+const cleanedTranscript = transcript.replace(/(\d+)\./g, "$1"); // clean dot after numbers
+const removeMatch = cleanedTranscript.match(/(?:remove(?: (\w+))?|remove entire|i don't like|no more|take off)\s+(.+)/i);
+
+if (removeMatch) {
+  const qtyWord = removeMatch[1]?.toLowerCase().replace(".", "");
+
+  const quantityToRemove = qtyWord ? (numberWords[qtyWord] || parseInt(qtyWord, 10)) : null;
+  let spokenItem = normalizeText(removeMatch[2]);
+
+  const rows = document.querySelectorAll('#orderTable tbody tr');
+  let itemFound = false;
+
+  rows.forEach(row => {
+    const rowItem = normalizeText(row.children[1].textContent);
+
+    if (isFuzzyMatch(rowItem, spokenItem)) {
+      itemFound = true;
+
+      const qtySpan = row.querySelector('.qty');
+      let currentQty = parseInt(qtySpan.textContent);
+
+      if (quantityToRemove === null || quantityToRemove >= currentQty) {
+        row.remove(); // Remove entire row
+      } else {
+        currentQty -= quantityToRemove;
+        qtySpan.textContent = currentQty;
+        const rate = parseFloat(row.children[2].textContent);
+        row.querySelector('.total').textContent = (rate * currentQty).toFixed(2);
+      }
+    }
+  });
+
+  if (!itemFound) {
+    alert(`Item "${spokenItem}" not found in order.`);
+  }
+
+  document.getElementById('removeBtn').disabled = true;
+}
+
+// ========================== ADD =============================
+if (transcript.includes("add")) {
+  const addPattern = /add\s+(\w+)\s+(.+)/i;
+  const match = transcript.match(addPattern);
+
+  if (match) {
+    const qtyWord = match[1].toLowerCase();
+    const quantityToAdd = numberWords[qtyWord] || parseInt(qtyWord, 10) || 1;
+    let spokenItem = normalizeText(match[2]);
+
+    const rows = document.querySelectorAll('#orderTable tbody tr');
+    let itemFound = false;
+
+    rows.forEach(row => {
+      const rowItem = normalizeText(row.children[1].textContent);
+
+      if (isFuzzyMatch(rowItem, spokenItem)) {
+        itemFound = true;
+
+        const qtySpan = row.querySelector('.qty');
+        let currentQty = parseInt(qtySpan.textContent);
+        const newQty = currentQty + quantityToAdd;
+        qtySpan.textContent = newQty;
+
+        const rate = parseFloat(row.children[2].textContent);
+        const totalCell = row.querySelector('.total');
+        totalCell.textContent = (rate * newQty).toFixed(2);
+      }
+    });
+
+    if (!itemFound) {
+      alert(`Item "${spokenItem}" not found in order. Please add it first using the menu.`);
+    }
+  }
+}
+
+};
+
+// recognition.onerror = (e) => {
+//   console.error("Speech recognition error:", e);
+// };
+recognition.onerror = (e) => {
+  if (e.error === 'no-speech') {
+    document.getElementById("fullTranscriptText").innerText += "\n🤖 I am waiting...\n";
+    console.warn("No speech detected. Waiting for user input...");
+  } else {
+    console.error("Speech recognition error:", e);
+  }
+};
+
+recognition.onend = () => {
+  recognition.start(); // keep listening
+};
+
+recognition.start();
+
+   let mediaRecorder;
+   let audioChunks = [];
+ function openMiniMenu() {
+  const modal = document.getElementById("miniMenuModal");
+  const form = document.getElementById("miniMenuForm");
+  form.innerHTML = ""; // Clear previous content
+
+  // Populate from CSV or fixed list
+  fetch('./menu.csv')
+    .then(res => res.text())
+    .then(csv => {
+      const lines = csv.trim().split('\n').slice(1);
+      lines.forEach((line, index) => {
+        const [, category, itemName, price] = line.split(',');
+        const id = `item-${index}`;
+        form.innerHTML += `
+          <label style="display:block; margin-bottom:5px;">
+            <input type="checkbox" id="${id}" data-name="${itemName}" data-price="${price}" />
+            ${itemName} — ₹${price}
+          </label>`;
+      });
+      modal.style.display = "block";
+    });
+}
+
+function closeMiniMenu() {
+  document.getElementById("miniMenuModal").style.display = "none";
+}
+
+function submitMiniMenu() {
+  const checkboxes = document.querySelectorAll("#miniMenuForm input[type='checkbox']:checked");
+  const selectedItems = [];
+
+  checkboxes.forEach(cb => {
+    const item = cb.getAttribute("data-name");
+    const rate = parseFloat(cb.getAttribute("data-price"));
+    selectedItems.push({
+      Item: item,
+      Rate: rate,
+      Quantity: 1
+    });
+  });
+
+  if (selectedItems.length > 0) {
+    appendToTable(selectedItems);
+    closeMiniMenu();
+  } else {
+    alert("Please select at least one item.");
+  }
+}
+function addItems() {
+  openMiniMenu();
+}
+
+   document.addEventListener('DOMContentLoaded', () => {
+     loadMenu();
+   });
+ 
+   function loadMenu() {
+     fetch('./menu.csv')
+       .then(res => res.text())
+       .then(csv => {
+         const lines = csv.trim().split('\n').slice(1);
+         const menu = {};
+         lines.forEach(line => {
+           const [id,Category, ItemName, Price] = line.split(',');
+           if (!menu[Category]) menu[Category] = [];
+           menu[Category].push({ ItemName, Price });
+         });
+ 
+         const container = document.getElementById('menu-container');
+         let index = 0;
+         for (const category in menu) {
+           const section = document.createElement('div');
+          section.className = `menu-section ${index % 2 === 0 ? 'left' : 'right'}`;
+ 
+           const img = document.createElement('img');
+          img.src = `images/categories/${category.toLowerCase()}.jpg`;
+           img.alt = category;
+           img.className = 'category-image';
+ 
+           const content = document.createElement('div');
+ 
+           const title = document.createElement('h3');
+           title.textContent = category;
+ 
+           const list = document.createElement('ul');
+           menu[category].forEach(item => {
+             const li = document.createElement('li');
+            li.textContent = `${item.ItemName} — ₹${item.Price}`;
+             list.appendChild(li);
+           });
+ 
+           content.appendChild(title);
+           content.appendChild(list);
+ 
+           section.appendChild(img);
+           section.appendChild(content);
+           container.appendChild(section);
+ 
+           index++;
+         }
+       });
+   }
+ function stopRecording() {
+  stopBtn.disabled = true;
+  startBtn.disabled = false;
+
+  isRecording = false;
+  document.getElementById("fullTranscriptText").innerText = liveTranscript || "🗣 No speech captured.";
+  
+  if (mediaRecorder) mediaRecorder.stop();
+}
+function startRecording() {
+  startBtn.disabled = true;
+  stopBtn.disabled = false;
+
+  isRecording = true;
+  liveTranscript = "";
+  document.getElementById("fullTranscriptText").innerText = "🗣 Listening...";
+
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(audioChunks, { type: "audio/wav" });
+      const file = new File([blob], "recording.wav", { type: "audio/wav" });
+      document.getElementById("audioUpload").files = createFileList(file);
+    };
+    mediaRecorder.start();
+  });
+}
+
+
+//  function startRecording() {
+//   startBtn.disabled = true;
+//   stopBtn.disabled = false;
+
+//   navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+//     mediaRecorder = new MediaRecorder(stream);
+//     audioChunks = [];
+//     mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+//     mediaRecorder.onstop = () => {
+//       const blob = new Blob(audioChunks, { type: "audio/wav" });
+//       const file = new File([blob], "recording.wav", { type: "audio/wav" });
+//       document.getElementById("audioUpload").files = createFileList(file);
+//     };
+//     mediaRecorder.start();
+//   });
+// }
+
+// function stopRecording() {
+//   stopBtn.disabled = true;
+//   startBtn.disabled = false;
+
+//   if (mediaRecorder) mediaRecorder.stop();
+// }
+ let sessionId = "";
+
+  function generateSessionId() {
+    return "sess_" + Math.random().toString(36).substring(2, 10);
+  }
+   function createFileList(file) {
+     const dataTransfer = new DataTransfer();
+     dataTransfer.items.add(file);
+     return dataTransfer.files;
+   }
+ 
+  //  function processAudio() {
+  //    const input = document.getElementById("audioUpload");
+  //    const processBtn = document.querySelector("button[onclick='processAudio()']");
+     
+  //    if (!input.files.length) {
+  //      alert("Please record or upload a WAV file.");
+  //      return;
+  //    }
+ 
+  //    processBtn.disabled = true;
+  //    processBtn.textContent = "⏳ Processing...";
+ 
+  //    const formData = new FormData();
+  //    formData.append("file", input.files[0]);
+ 
+  //    fetch("http://127.0.0.1:8000/process/", {
+  //      method: "POST",
+  //      body: formData,
+  //    })
+  //      .then(res => res.json())
+  //      .then(data => {
+  //        document.getElementById("transcriptionText").innerText = data.transcription || "No text found";
+  //        appendToTable(data.order || []);
+  //        document.getElementById("gptResponseText").innerText = `Final Response: ${data.gpt_response || "N/A"}`;
+  //        document.getElementById("matchAccuracy").innerText = `Accuracy: ${data.accuracy || 0}%`;
+  //        document.getElementById("unmatchedItems").innerText = `❌ Unmatched Items: ${data.unmatched?.join(", ") || "None"}`;
+  //      })
+  //      .catch(err => {
+  //        alert("Error processing audio.");
+  //      })
+  //      .finally(() => {
+  //        processBtn.disabled = false;
+  //        processBtn.textContent = "📅 Process";
+  //      });
+   //}
+   function processAudio() {
+  const input = document.getElementById("audioUpload");
+  const processBtn = document.querySelector("button[onclick='processAudio()']");
+
+  if (!input.files.length) {
+    alert("Please record or upload a WAV file.");
+    return;
+  }
+
+  if (!sessionId) sessionId = generateSessionId();  // 🔥 Create session only once
+
+  processBtn.disabled = true;
+  processBtn.textContent = "⏳ Processing...";
+
+  const formData = new FormData();
+  formData.append("file", input.files[0]);
+  formData.append("session_id", sessionId);  // ✅ Send session ID
+
+  fetch("http://127.0.0.1:8000/process/", {
+    method: "POST",
+    body: formData,
+  })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("transcriptionText").innerText = data.transcription || "No text found";
+      appendToTable(data.order || []);
+      document.getElementById("gptResponseText").innerText = `Final Response: ${data.gpt_response || "N/A"}`;
+      document.getElementById("matchAccuracy").innerText = `Accuracy: ${data.accuracy || 0}%`;
+      document.getElementById("unmatchedItems").innerText = `❌ Unmatched Items: ${data.unmatched?.join(", ") || "None"}`;
+    })
+    .catch(err => {
+      alert("Error processing audio.");
+    })
+    .finally(() => {
+      processBtn.disabled = false;
+      processBtn.textContent = "📅 Process";
+    });
+}
+
+ 
+   function appendToTable(order) {
+     const tbody = document.querySelector("#orderTable tbody");
+ 
+     order.forEach(newItem => {
+       if (newItem.Item.toLowerCase() === "total amount") return;
+ 
+       const existingRow = [...tbody.rows].find(row => row.children[1].textContent.toLowerCase() === newItem.Item.toLowerCase());
+ 
+       if (existingRow) {
+         // Update quantity and total if item exists
+         const qtyCell = existingRow.children[3];
+         const totalCell = existingRow.children[4];
+         const existingQty = parseInt(qtyCell.textContent);
+         const newQty = existingQty + parseInt(newItem.Quantity);
+         const rate = parseFloat(existingRow.children[2].textContent);
+         const newTotal = rate * newQty;
+ 
+         qtyCell.textContent = newQty;
+         totalCell.textContent = newTotal.toFixed(2);
+       } else {
+         // Add new row
+         const tr = document.createElement("tr");
+         tr.innerHTML = `
+           <td><input type="checkbox" onchange="toggleRemoveBtn()" /></td>
+           <td>${newItem.Item}</td>
+           <td>${newItem.Rate}</td>
+            <td>
+              <button onclick="updateQuantity(this, -1)">➖</button>
+              <span class="qty">${newItem.Quantity}</span>
+              <button onclick="updateQuantity(this, 1)">➕</button>
+            </td>
+            <td class="total">${(newItem.Rate * newItem.Quantity).toFixed(2)}</td>
+         `;
+         tbody.appendChild(tr);
+       }
+     });
+   }
+ 
+   function toggleRemoveBtn() {
+     const checked = [...document.querySelectorAll("tbody input[type='checkbox']")].some(cb => cb.checked);
+     const btn = document.getElementById("removeBtn");
+     btn.disabled = !checked;
+     btn.classList.toggle("black-btn", checked);
+   }
+   function updateQuantity(button, change) {
+  const qtySpan = button.parentElement.querySelector('.qty');
+  let qty = parseInt(qtySpan.textContent);
+  qty = Math.max(1, qty + change); // Prevent quantity from going below 1
+  qtySpan.textContent = qty;
+
+  const row = button.closest('tr');
+  const rate = parseFloat(row.children[2].textContent);
+  const totalCell = row.querySelector('.total');
+  totalCell.textContent = (rate * qty).toFixed(2);
+}
+
+   function removeItems() {
+     const checkboxes = document.querySelectorAll("tbody input[type='checkbox']");
+     checkboxes.forEach(cb => {
+       if (cb.checked) cb.closest("tr").remove();
+     });
+     toggleRemoveBtn();
+   }
+ 
+   function addItems() {
+      openMiniMenu();
+     alert("Add more items using voice or upload — they'll be merged into your current table.");
+   }
+ 
+  function confirmOrder() {
+     const rows = document.querySelectorAll("#orderTable tbody tr");
+     const confirmbtn=document.querySelector("button[onclick='confirmOrder()']");
+     if (rows.length === 0) {
+       alert("No items to confirm!");
+       return;
+     }
+ 
+     const finalList = document.getElementById("final-order-list");
+     const totalAmountEl = document.getElementById("total-amount");
+     let totalAmount = 0;
+     finalList.innerHTML = "";
+ 
+     rows.forEach(row => {
+       const item = row.children[1].textContent;
+       const rate = parseFloat(row.children[2].textContent);
+       const qty = parseInt(row.children[3].querySelector('.qty').textContent);
+       const total = parseFloat(row.children[4].textContent);
+       totalAmount += total;
+ 
+       const li = document.createElement("li");
+      li.textContent = `${item} - ₹${rate} * ${qty} = ₹${total}`;
+       finalList.appendChild(li);
+     });
+ 
+    totalAmountEl.textContent = `Total Amount: ₹${totalAmount.toFixed(2)}`;
+     document.getElementById("final-order-summary").style.display = "block";
+
+    // 👇 SHOW feedback section after confirmation
+     document.getElementById("feedback-section").style.display = "block";
+     // Example trigger after GPT responds
+setTimeout(() => {
+  showFeedbackPopup();
+}, 3000); // Adjust as needed
+
+   }
+ 
+   function resetOrder() {
+     location.reload();
+     isInitialized = false;
+  ignoreOtherSpeakers = false;
+  lockedVoiceProfile = null;
+
+  // Stop and reset microphone stream
+  if (micStream) {
+    micStream.getTracks().forEach(track => track.stop());
+    micStream = null;
+  }
+
+  // Close and reset audio context
+  if (audioContext) {
+    audioContext.close();
+    audioContext = null;
+    analyser = null;
+  }
+   }
+   function submitFeedback(value) {
+      const resultText = document.getElementById("feedback-result");
+      resultText.textContent = "Submitting feedback...";
+    
+      const gptResponse = document.getElementById("gptResponseText").textContent || "";
+      const rows = document.querySelectorAll("#orderTable tbody tr");
+      const order = [];
+    
+      rows.forEach(row => {
+        const item = row.children[1]?.textContent || "";
+        const rate = parseFloat(row.children[2]?.textContent || "0");
+        const qty = parseInt(row.children[3]?.querySelector(".qty")?.textContent || "0");
+        const total = parseFloat(row.children[4]?.textContent || "0");
+    
+        if (item && !isNaN(rate) && !isNaN(qty)) {
+          order.push({ Item: item, Rate: rate, Quantity: qty, Total: total });
+        }
+      });
+    
+      if (value === "down") {
+        document.getElementById("detailed-feedback").style.display = "block";
+        return; // Wait for detailed feedback submission
+      }
+    
+      fetch("http://127.0.0.1:8000/feedback/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          session_id: sessionId,  // ✅ Include session ID
+          feedback: value,
+          gpt_response: gptResponse,
+          final_order: order
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          resultText.textContent = "✅ Thank you for your feedback!";
+        })
+        .catch(err => {
+          resultText.textContent = "⚠️ Failed to submit feedback.";
+        });
+    }
+
+    // function submitDetailedFeedback() {
+    //   const issues = [...document.querySelectorAll("input[name='issue']:checked")].map(cb => cb.value);
+    //   const resultText = document.getElementById("detailed-feedback-result");
+    
+    //   const gptResponse = document.getElementById("gptResponseText").textContent || "";
+    //   const rows = document.querySelectorAll("#orderTable tbody tr");
+    //   const order = [];
+    
+    //   rows.forEach(row => {
+    //     const item = row.children[1]?.textContent || "";
+    //     const rate = parseFloat(row.children[2]?.textContent || "0");
+    //     const qty = parseInt(row.children[3]?.querySelector(".qty")?.textContent || "0");
+    //     const total = parseFloat(row.children[4]?.textContent || "0");
+    
+    //     if (item && !isNaN(rate) && !isNaN(qty)) {
+    //       order.push({ Item: item, Rate: rate, Quantity: qty, Total: total });
+    //     }
+    //   });
+    
+    //   fetch("http://127.0.0.1:8000/feedback/", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json"
+    //     },
+    //     body: JSON.stringify({
+    //       feedback: "down",
+    //       issues: issues,
+    //       gpt_response: gptResponse,
+    //       final_order: order
+    //     })
+    //   })
+    //     .then(res => res.json())
+    //     .then(data => {
+    //       resultText.textContent = "✅ Thanks for your detailed feedback!";
+    //       document.getElementById("feedback-result").textContent = "";
+    //     })
+    //     .catch(err => {
+    //       resultText.textContent = "⚠️ Failed to submit feedback.";
+    //     });
+    // }
+
+// Show popup when ready
+function showFeedbackPopup() {
+  document.getElementById("popup-overlay").style.display = "flex";
+  document.getElementById("feedback-section").style.display = "block";
+}
+
+// Question flow
+const issuesList = [
+  { key: "wrong_item", text: "Wrong items detected?" },
+  { key: "wrong_quantity", text: "Incorrect quantity?" },
+  { key: "price_mismatch", text: "Price mismatch?" },
+  { key: "item_unavailable", text: "Item not available?" },
+  { key: "other", text: "Other issue?" }
+];
+
+let currentIssueIndex = 0;
+let selectedIssues = [];
+
+function handleNegativeFeedback() {
+  document.querySelector("h2").textContent = "⚠️ What went wrong?";
+  document.querySelectorAll(".popup-btn").forEach(btn => btn.style.display = "none");
+  document.getElementById("issue-question").style.display = "block";
+  currentIssueIndex = 0;
+  selectedIssues = [];
+  showNextIssue();
+}
+
+function showNextIssue() {
+  if (currentIssueIndex >= issuesList.length) {
+    submitDetailedPopupFeedback();
+    return;
+  }
+
+  const issue = issuesList[currentIssueIndex];
+  document.getElementById("issue-text").textContent = issue.text;
+}
+
+function recordAnswer(answer) {
+  const issue = issuesList[currentIssueIndex];
+
+  if (answer === "yes") {
+    selectedIssues.push(issue.key);
+  }
+
+  currentIssueIndex++;
+  showNextIssue();
+}
+
+function submitDetailedPopupFeedback() {
+  const gptResponse = document.getElementById("gptResponseText")?.textContent || "";
+  const rows = document.querySelectorAll("#orderTable tbody tr");
+  const order = [];
+
+  rows.forEach(row => {
+    const item = row.children[1]?.textContent || "";
+    const rate = parseFloat(row.children[2]?.textContent || "0");
+    const qty = parseInt(row.children[3]?.querySelector(".qty")?.textContent || "0");
+    const total = parseFloat(row.children[4]?.textContent || "0");
+
+    if (item && !isNaN(rate) && !isNaN(qty)) {
+      order.push({ Item: item, Rate: rate, Quantity: qty, Total: total });
+    }
+  });
+
+  fetch("http://127.0.0.1:8000/feedback/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      session_id: sessionId,  // ✅ MUST include here too
+      feedback: "down",
+      issues: selectedIssues,
+      gpt_response: gptResponse,
+      final_order: order
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("feedback-result").textContent = "✅ Thank you for your feedback!";
+      document.getElementById("issue-question").style.display = "none";
+      setTimeout(() => {
+        document.getElementById("popup-overlay").style.display = "none";
+      }, 1500);
+    })
+    .catch(err => {
+      document.getElementById("feedback-result").textContent = "⚠️ Failed to submit feedback.";
+    });
+}
+
+ </script>
+ 
+<!-- <section id="feedback-section" style="display:none; margin-top: 20px;">
+  <h2>🙏 Was this ordering session helpful?</h2>
+  <button onclick="submitFeedback('up')">👍 Yes</button>
+  <button onclick="submitFeedback('down')">👎 No</button>
+  <p id="feedback-result" style="margin-top:10px; color:var(--muted);"></p>
+</section>
+<!-- 👇 Add this right after the feedback section 
+<div id="detailed-feedback" style="display: none; margin-top: 10px;">
+  <p>⚠️ What went wrong?</p>
+  <label><input type="checkbox" name="issue" value="wrong_item"> Wrong items detected</label><br>
+  <label><input type="checkbox" name="issue" value="wrong_quantity"> Incorrect quantity</label><br>
+  <label><input type="checkbox" name="issue" value="price_mismatch"> Price mismatch</label><br>
+  <label><input type="checkbox" name="issue" value="item_unavailable"> Item not available</label><br>
+  <label><input type="checkbox" name="issue" value="other"> Other</label><br>
+  <button onclick="submitDetailedFeedback()">📨 Submit Feedback</button>
+  <p id="detailed-feedback-result"></p>
+</div> -->
+<style>
+  #popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  #feedback-section {
+    background: rgb(0, 0, 0);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 300px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    display: none;
+  }
+
+  #issue-question {
+    margin-top: 15px;
+  }
+
+  .popup-btn {
+    margin: 5px;
+  }
+</style>
+
+<div id="popup-overlay">
+  <section id="feedback-section">
+    <h2>🙏 Was this ordering session helpful?</h2>
+    <button class="popup-btn" onclick="submitFeedback('up')">👍 Yes</button>
+    <button class="popup-btn" onclick="handleNegativeFeedback()">👎 No</button>
+    <p id="feedback-result" style="margin-top:10px; color:var(--muted);"></p>
+
+    <div id="issue-question" style="display:none;">
+      <p id="issue-text">Question here</p>
+      👉 <button onclick="recordAnswer('yes')">Yes</button>
+      <button onclick="recordAnswer('no')">No</button>
+      <button onclick="recordAnswer('skip')">Skip</button>
+    </div>
+  </section>
+</div>
+
+ </body>
+ </html>
